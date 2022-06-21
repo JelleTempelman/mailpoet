@@ -9,5 +9,8 @@
   "devDependencies": {
     "lint-staged": "^12.3.7",
     "prettier": "2.6.2"
+  },
+  "dependencies": {
+    "@automattic/isolated-block-editor": "^2.15.0"
   }
 }

@@ -19,7 +19,7 @@ export const getEditorSettings = () => ({
   templateLock: false,
   reusableBlocks: [],
   defaultEditorStyles: null,
-  __experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+  fetchLinkSuggestions,
   __experimentalBlockPatterns: [], // we don't want patterns in our inserter
   __experimentalBlockPatternCategories: [],
   __experimentalFeatures: {

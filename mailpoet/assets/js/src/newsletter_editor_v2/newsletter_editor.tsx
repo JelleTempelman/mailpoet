@@ -29,6 +29,7 @@ import {
 } from './blocks/header';
 
 import { getEditorSettings } from './settings';
+
 // Register hooks for button
 registerButton();
 registerColumns();
