@@ -1,8 +1,9 @@
 import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
+import { BlockConfiguration, TemplateArray } from '@wordpress/blocks';
 
 export const name = 'mailpoet/footer';
 
-const footerTemplate = [
+const footerTemplate: TemplateArray = [
   [
     'core/paragraph',
     {
@@ -13,11 +14,12 @@ const footerTemplate = [
   ['core/paragraph', { content: 'Add your address' }],
 ];
 
-export const settings = {
+export const settings: BlockConfiguration = {
   title: 'Email Footer',
   apiVersion: 2,
   description: 'Email Footer Content',
   category: 'text',
+  attributes: {},
   supports: {
     html: false,
     multiple: true,

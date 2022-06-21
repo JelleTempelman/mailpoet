@@ -1,6 +1,12 @@
+import { BlockConfiguration, BlockEditProps } from '@wordpress/blocks';
+
 export const name = 'mailpoet/todo';
 
-export const settings = {
+type TodoAttributes = {
+  originalBlock: string;
+};
+
+export const settings: BlockConfiguration = {
   title: 'Todo block',
   description: 'This block needs to be implemented',
   category: 'text',
@@ -14,10 +20,12 @@ export const settings = {
     html: false,
     multiple: true,
   },
-  edit: function Edit({ attributes }): JSX.Element {
+  edit: function Edit({
+    attributes,
+  }: BlockEditProps<TodoAttributes>): JSX.Element {
     return <p>Todo {attributes.originalBlock}</p>;
   },
-  save(): string {
-    return '';
+  save() {
+    return null;
   },
 };

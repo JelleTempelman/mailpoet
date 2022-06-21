@@ -5,13 +5,20 @@ import { select } from '@wordpress/data';
 
 export const getEditorSettings = () => ({
   ...SETTINGS_DEFAULTS,
-  allowedMimeTypes: 'image/*',
-  mediaUpload: select('core').canUser('create', 'media') ? uploadMedia : null,
+  allowedMimeTypes: ['image/*'],
+  mediaUpload: select('core').canUser('create', 'media', '')
+    ? uploadMedia
+    : null,
   maxWidth: 580,
   enableCustomSpacing: true,
   enableCustomLineHeight: true,
   disableCustomFontSizes: false,
   enableCustomUnits: true,
+  hasUploadPermissions: select('core').canUser('create', 'media', ''),
+  template: null,
+  templateLock: false,
+  reusableBlocks: [],
+  defaultEditorStyles: null,
   __experimentalFetchLinkSuggestions: fetchLinkSuggestions,
   __experimentalBlockPatterns: [], // we don't want patterns in our inserter
   __experimentalBlockPatternCategories: [],

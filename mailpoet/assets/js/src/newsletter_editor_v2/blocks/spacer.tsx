@@ -48,13 +48,11 @@ export const registerSpacer = () => {
             <InspectorControls>
               <PanelBody title={__('Background Color')}>
                 <ColorPicker
-                  color={backgroundColor}
-                  enableAlpha
-                  copyFormat="hex"
-                  onChange={(bgColor) =>
+                  color={backgroundColor || defaultBgColor}
+                  disableAlpha={false}
+                  onChangeComplete={(bgColor) =>
                     setAttributes({ backgroundColor: bgColor })
                   }
-                  defaultValue={defaultBgColor}
                 />
               </PanelBody>
             </InspectorControls>

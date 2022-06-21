@@ -48,7 +48,7 @@ const loadInitialContent = (parse) => {
 };
 
 function EmailEditor() {
-  const editor: EditorSettings = getEditorSettings();
+  const editor = getEditorSettings() as EditorSettings;
   const iso: IsoSettings = {
     blocks: {
       allowBlocks: [

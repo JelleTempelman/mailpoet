@@ -1,59 +1,41 @@
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
+import { BlockConfiguration, TemplateArray } from '@wordpress/blocks';
 
 export const name = 'mailpoet/header';
 
-export const settings = {
+const headerTemplate: TemplateArray = [
+  [
+    'core/paragraph',
+    {
+      content: '<a href="[link:view_in_browser]">View in Browser</a>',
+    },
+  ],
+  ['core/paragraph', { content: 'Add your address' }],
+];
+
+export const settings: BlockConfiguration = {
   title: 'Email Header',
   apiVersion: 2,
   description: 'Email Header Content',
   category: 'text',
-  attributes: {
-    content: {
-      type: 'array',
-      source: 'children',
-      selector: 'p',
-      default: [
-        'Header: ',
-        {
-          type: 'a',
-          props: {
-            children: ['View in Browser'],
-            href: '[link:view_in_browser]',
-          },
-        },
-      ],
-    },
-  },
+  attributes: {},
   supports: {
     html: false,
     multiple: true,
   },
-  edit: function Edit(props) {
-    const {
-      attributes: { content },
-      setAttributes,
-    } = props;
+  edit: function Edit() {
     const blockProps = useBlockProps();
-    const onChangeContent = (newContent) => {
-      setAttributes({ content: newContent });
-    };
     return (
-      <RichText
-        {...blockProps}
-        tagName="p"
-        onChange={onChangeContent}
-        value={content}
-      />
+      <div {...blockProps}>
+        <InnerBlocks
+          allowedBlocks={['core/paragraph']}
+          template={headerTemplate}
+          templateLock={false}
+        />
+      </div>
     );
   },
-  save: (props) => {
-    const blockProps = useBlockProps.save();
-    return (
-      <RichText.Content
-        {...blockProps}
-        tagName="p"
-        value={props.attributes.content}
-      />
-    );
+  save: function Save() {
+    return <InnerBlocks.Content />;
   },
 };
