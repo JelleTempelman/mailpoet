@@ -125,4 +125,5 @@ interface Window {
   };
   mailpoet_authorized_emails?: string[];
   mailpoet_email_content?: string;
+  mailpoet_email_editor_settings?: any;
 }

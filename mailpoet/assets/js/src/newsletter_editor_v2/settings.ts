@@ -5,34 +5,16 @@ import { select } from '@wordpress/data';
 
 export const getEditorSettings = () => ({
   ...SETTINGS_DEFAULTS,
-  allowedMimeTypes: ['image/*'],
+  ...window.mailpoet_email_editor_settings,
   mediaUpload: select('core').canUser('create', 'media', '')
     ? uploadMedia
     : null,
-  maxWidth: 580,
-  enableCustomSpacing: true,
-  enableCustomLineHeight: true,
-  disableCustomFontSizes: false,
-  enableCustomUnits: true,
+  maxWidth: 580, // Force max width for emails - we may later introduce multiple widths
   hasUploadPermissions: select('core').canUser('create', 'media', ''),
   template: null,
   templateLock: false,
   reusableBlocks: [],
-  defaultEditorStyles: null,
   fetchLinkSuggestions,
   __experimentalBlockPatterns: [], // we don't want patterns in our inserter
   __experimentalBlockPatternCategories: [],
-  __experimentalFeatures: {
-    color: {
-      custom: true,
-      text: true,
-      background: true,
-      customGradient: false,
-      defaultPalette: true,
-      palette: {
-        default: SETTINGS_DEFAULTS.colors,
-      },
-      gradients: {},
-    },
-  },
 });

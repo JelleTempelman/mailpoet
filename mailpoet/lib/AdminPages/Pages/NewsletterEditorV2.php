@@ -52,6 +52,111 @@ class NewsletterEditorV2 {
       true
     );
 
-    $this->pageRenderer->displayPage('newsletter/editorv2.html', ['body' => $newsletterBody]);
+    if (function_exists('get_block_editor_settings')) {
+      $settings = get_block_editor_settings([], new \WP_Block_Editor_Context());
+    } else {
+      $settings = $this->getEditorSettingsFallback();
+    }
+
+    $this->pageRenderer->displayPage('newsletter/editorv2.html', ['body' => $newsletterBody, 'settings' => $settings]);
+  }
+
+  /**
+   * Set up Gutenberg editor settings - in case get_block_editor_settings is not defined
+   */
+  public function getEditorSettingsFallback(): array {
+    global $editor_styles;
+
+    $colorPalette = current((array)get_theme_support('editor-color-palette'));
+    $fontSizes = current((array)get_theme_support('editor-font-sizes'));
+
+    $maxUploadSize = wp_max_upload_size();
+    if (!$maxUploadSize) {
+      $maxUploadSize = 0;
+    }
+
+    // Editor Styles.
+    $styles = array(
+      array(
+        'css' => file_get_contents(
+          ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+        ),
+      ),
+    );
+
+    $localeFontFamily = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font' );
+    $styles[] = array(
+      'css' => "body { font-family: '$localeFontFamily' }",
+    );
+
+    if ($editor_styles && current_theme_supports( 'editor-styles' ) ) {
+      foreach ( $editor_styles as $style ) {
+        if ( preg_match( '~^(https?:)?//~', $style ) ) {
+          $response = wp_remote_get( $style );
+          if ( ! is_wp_error( $response ) ) {
+            $styles[] = array(
+              'css' => wp_remote_retrieve_body( $response ),
+            );
+          }
+        } else {
+          $file = get_theme_file_path( $style );
+          if ( is_file( $file ) ) {
+            $styles[] = array(
+              'css' => file_get_contents( $file ),
+              'baseURL' => get_theme_file_uri( $style ),
+            );
+          }
+        }
+      }
+    }
+
+    $image_size_names = apply_filters(
+      'image_size_names_choose',
+      array(
+        'thumbnail' => __( 'Thumbnail' ),
+        'medium' => __( 'Medium' ),
+        'large' => __( 'Large' ),
+        'full' => __( 'Full Size' ),
+      )
+    );
+
+    $available_image_sizes = array();
+    foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
+      $available_image_sizes[] = array(
+        'slug' => $image_size_slug,
+        'name' => $image_size_name,
+      );
+    }
+
+    /**
+     * @psalm-suppress TooManyArguments
+     */
+    $editorSettings = array(
+      'disableCustomColors' => get_theme_support('disable-custom-colors'),
+      'disableCustomFontSizes' => get_theme_support('disable-custom-font-sizes'),
+      'disablePostFormats' => !current_theme_supports('post-formats'),
+      /** This filter is documented in wp-admin/edit-form-advanced.php */
+      'isRTL' => is_rtl(),
+      'autosaveInterval' => AUTOSAVE_INTERVAL,
+      'maxUploadFileSize' => $maxUploadSize,
+      'allowedMimeTypes' => [],
+      'styles' => $styles,
+      'imageSizes' => $available_image_sizes,
+      'richEditingEnabled' => user_can_richedit(),
+      'codeEditingEnabled' => false,
+      '__experimentalCanUserUseUnfilteredHTML' => false,
+      '__experimentalBlockPatterns' => [],
+      '__experimentalBlockPatternCategories' => [],
+    );
+
+    if ( false !== $colorPalette ) {
+      $editorSettings['colors'] = $colorPalette;
+    }
+
+    if ( false !== $fontSizes ) {
+      $editorSettings['fontSizes'] = $fontSizes;
+    }
+
+    return $editorSettings;
   }
 }
