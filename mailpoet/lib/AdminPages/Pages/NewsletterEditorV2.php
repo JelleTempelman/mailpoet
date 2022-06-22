@@ -41,8 +41,7 @@ class NewsletterEditorV2 {
       $newsletterBody = $this->gutenbergMapper->map($newsletter->getBody() ?? []);
     }
     // Gutenberg styles
-    $this->wp->wpEnqueueStyle('wp-edit-post' );
-    $this->wp->wpEnqueueStyle('wp-format-library');
+    $this->wp->wpEnqueueStyle('mailpoet_email_editor_v2', Env::$assetsUrl . '/dist/css/mailpoet-email-editor.css');
     $this->wp->wpEnqueueMedia();
 
     $this->wp->wpEnqueueScript(
