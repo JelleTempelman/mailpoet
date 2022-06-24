@@ -285,6 +285,8 @@ const adminConfig = {
     automation_editor: 'automation/editor/index.tsx',
     newsletter_editor: 'newsletter_editor/webpack_index.jsx',
     newsletter_editor_v2: 'newsletter_editor_v2/newsletter_editor.tsx',
+    newsletter_editor_v2_boot:
+      'newsletter_editor_v2/newsletter_editor_boot.tsx',
     form_editor: 'form_editor/form_editor.jsx',
     settings: 'settings/index.tsx',
   },

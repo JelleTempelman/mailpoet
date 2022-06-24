@@ -44,9 +44,13 @@ class NewsletterEditorV2 {
     $this->wp->wpEnqueueStyle('mailpoet_email_editor_v2', Env::$assetsUrl . '/dist/css/mailpoet-email-editor.css');
     $this->wp->wpEnqueueMedia();
 
+    $editorApp = '/dist/js/newsletter_editor_v2.js'; // Isolated Editor
+    if ($_GET['boot']) {
+      $editorApp = '/dist/js/newsletter_editor_v2_boot.js'; // Custom Bootstrapped Editor
+    }
     $this->wp->wpEnqueueScript(
       'mailpoet_email_editor_v2',
-      Env::$assetsUrl . '/dist/js/newsletter_editor_v2.js',
+      Env::$assetsUrl . $editorApp,
       [],
       Env::$version,
       true
