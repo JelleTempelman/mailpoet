@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import { Popover, SlotFillProvider } from '@wordpress/components';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import {
   ComplementaryArea,
   InterfaceSkeleton,
@@ -8,8 +9,11 @@ import {
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { Header } from './components/header';
 import { Sidebar } from './components/sidebar/index';
+import { VisualEditor } from './components/visual_editor';
 
 // See: https://github.com/WordPress/gutenberg/blob/9601a33e30ba41bac98579c8d822af63dd961488/packages/edit-post/src/components/layout/index.js
+
+registerCoreBlocks();
 
 export function Editor(): JSX.Element {
   const className = classnames(
@@ -29,7 +33,7 @@ export function Editor(): JSX.Element {
         <InterfaceSkeleton
           className={className}
           header={<Header />}
-          content={<h1>Hello</h1>}
+          content={<VisualEditor />}
           sidebar={<ComplementaryArea.Slot scope="ss" />}
           secondarySidebar={false ? <div>Something</div> : null}
         />

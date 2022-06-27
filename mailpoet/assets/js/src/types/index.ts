@@ -49,6 +49,9 @@ declare module '@wordpress/block-editor' {
       gradient: string;
     }[];
   }
+
+  // types for the component are missing in @types/wordpress__block-editor
+  export const BlockTools: any;
 }
 
 declare module '@wordpress/components' {
