@@ -1,5 +1,6 @@
 import { Button, NavigableMenu } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
+import { storeName } from '../../store/constants';
 
 export function Header(): JSX.Element {
   return (
@@ -18,7 +19,7 @@ export function Header(): JSX.Element {
         <Button variant="primary" className="editor-post-publish-button">
           Publish
         </Button>
-        <PinnedItems.Slot scope="ss" />
+        <PinnedItems.Slot scope={storeName} />
       </div>
     </div>
   );
