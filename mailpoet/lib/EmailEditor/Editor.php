@@ -2,11 +2,15 @@
 
 namespace MailPoet\EmailEditor;
 
+use MailPoet\Config\Env;
+use MailPoet\DI\ContainerWrapper;
+
 class Editor {
   const EMAIL_POST_TYPE = 'mailpoet_email';
 
   public function init() {
     $this->registerEmailPostType();
+    add_action('enqueue_block_editor_assets', [$this, 'enqueueAssets']);
   }
 
   /**
@@ -30,5 +34,12 @@ class Editor {
         'supports' => ['editor'],
       ]
     );
+    // Temporary meta value for storing relation to mailpoet newsletter
+    register_post_meta(self::EMAIL_POST_TYPE, 'mp_newsletter', ['type' => 'integer']);
+  }
+
+  public function enqueueAssets() {
+    $src = Env::$assetsUrl . '/dist/js/newsletter_editor_v2_edit_post.js';
+    wp_enqueue_script('mailpoet-email-editor', $src, [], false, true);
   }
 }

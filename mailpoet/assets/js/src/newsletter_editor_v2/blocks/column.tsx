@@ -1,6 +1,6 @@
 import { addFilter } from '@wordpress/hooks';
-import { name as footerBlockName } from 'newsletter_editor_v2/blocks/footer';
-import { name as headerBlockName } from 'newsletter_editor_v2/blocks/header';
+import { name as footerBlockName } from './footer';
+import { name as headerBlockName } from './header';
 
 export const registerColumn = () => {
   const modifySettings = (settings, name) => {

@@ -5,8 +5,11 @@ namespace MailPoet\AdminPages\Pages;
 use MailPoet\AdminPages\PageRenderer;
 use MailPoet\Config\Menu;
 use MailPoet\Config\ServicesChecker;
+use MailPoet\EmailEditor\Editor;
 use MailPoet\Entities\SubscriberEntity;
 use MailPoet\Form\Util\CustomFonts;
+use MailPoet\Newsletter\GutenbergFormatMapper;
+use MailPoet\Newsletter\NewslettersRepository;
 use MailPoet\Newsletter\Shortcodes\ShortcodesHelper;
 use MailPoet\Services\Bridge;
 use MailPoet\Settings\SettingsController;
@@ -53,6 +56,12 @@ class NewsletterEditor {
   /** @var CustomFonts  */
   private $customFonts;
 
+  /** @var NewslettersRepository  */
+  private $newsletterRepository;
+
+  /** @var GutenbergFormatMapper */
+  private $gutenbergFormatMapper;
+
   public function __construct(
     PageRenderer $pageRenderer,
     SettingsController $settings,
@@ -64,7 +73,9 @@ class NewsletterEditor {
     ServicesChecker $servicesChecker,
     SubscribersRepository $subscribersRepository,
     TransactionalEmailHooks $wooEmailHooks,
-    CustomFonts $customFonts
+    CustomFonts $customFonts,
+    NewslettersRepository $newsletterRepository,
+    GutenbergFormatMapper $gutenbergFormatMapper
   ) {
     $this->pageRenderer = $pageRenderer;
     $this->settings = $settings;
@@ -77,10 +88,15 @@ class NewsletterEditor {
     $this->subscribersRepository = $subscribersRepository;
     $this->wooEmailHooks = $wooEmailHooks;
     $this->customFonts = $customFonts;
+    $this->newsletterRepository = $newsletterRepository;
+    $this->gutenbergFormatMapper = $gutenbergFormatMapper;
   }
 
   public function render() {
     $newsletterId = (isset($_GET['id']) ? (int)$_GET['id'] : 0);
+    if ($_GET['gutenberg']) {
+      return $this->openInGutenbergEditor($newsletterId);
+    }
     $woocommerceTemplateId = (int)$this->settings->get(TransactionalEmails::SETTING_EMAIL_ID, null);
     if (
       $woocommerceTemplateId
@@ -154,5 +170,36 @@ class NewsletterEditor {
       'unsubscribe_token' => $subscriber->getUnsubscribeToken(),
       'link_token' => $subscriber->getLinkToken(),
     ];
+  }
+
+  private function openInGutenbergEditor(int $newsletterId) {
+    $query = new \WP_Query(
+      [
+        'post_type' => Editor::EMAIL_POST_TYPE,
+        'meta_query' => array(
+          array(
+            'key' => 'mp_newsletter',
+            'value' => $newsletterId,
+          )
+        ),
+      ]
+    );
+    $posts = $query->get_posts();
+    if (count($posts)) {
+      $postId = $posts[0]->ID;
+    } else {
+      $newsletter = $this->newsletterRepository->findOneById($newsletterId);
+      $postId = wp_insert_post([
+        'post_type' => Editor::EMAIL_POST_TYPE,
+        'post_name' => $newsletter->getSubject(),
+        'post_content' => $this->gutenbergFormatMapper->map($newsletter->getBody()),
+        'meta_input' => [
+          'mp_newsletter' => $newsletterId
+        ],
+      ]);
+    }
+    $url = admin_url() . "post.php?post=$postId&action=edit";
+    wp_redirect($url);
+    wp_die();
   }
 }
