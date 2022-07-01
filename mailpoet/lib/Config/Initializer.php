@@ -8,6 +8,7 @@ use MailPoet\Automation\Engine\Engine;
 use MailPoet\Automation\Engine\Hooks as AutomationHooks;
 use MailPoet\Automation\Integrations\MailPoet\MailPoetIntegration;
 use MailPoet\Cron\CronTrigger;
+use MailPoet\EmailEditor\Editor;
 use MailPoet\Features\FeaturesController;
 use MailPoet\InvalidStateException;
 use MailPoet\PostEditorBlocks\PostEditorBlock;
@@ -102,6 +103,9 @@ class Initializer {
   /** @var FeaturesController */
   private $featuresController;
 
+  /** @var Editor  */
+  private $emailEditor;
+
   const INITIALIZED = 'MAILPOET_INITIALIZED';
 
   public function __construct(
@@ -129,7 +133,8 @@ class Initializer {
     AssetsLoader $assetsLoader,
     Engine $automationEngine,
     MailPoetIntegration $automationMailPoetIntegration,
-    FeaturesController $featuresController
+    FeaturesController $featuresController,
+    Editor $emailEditor
   ) {
     $this->rendererFactory = $rendererFactory;
     $this->accessControl = $accessControl;
@@ -156,6 +161,7 @@ class Initializer {
     $this->automationEngine = $automationEngine;
     $this->automationMailPoetIntegration = $automationMailPoetIntegration;
     $this->featuresController = $featuresController;
+    $this->emailEditor = $emailEditor;
   }
 
   public function init() {
@@ -263,6 +269,7 @@ class Initializer {
 
       $this->setupCapabilities();
       $this->menu->init();
+      $this->emailEditor->init();
       $this->setupShortcodes();
       $this->setupImages();
       $this->setupPersonalDataExporters();
