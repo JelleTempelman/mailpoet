@@ -25,6 +25,13 @@ class WorkflowStorage {
     $this->wpdb = $wpdb;
   }
 
+  public function truncate(): void {
+    $workflowTable = esc_sql($this->workflowTable);
+    $versionTable = esc_sql($this->versionsTable);
+    $this->wpdb->query("truncate $workflowTable");
+    $this->wpdb->query("truncate $versionTable");
+  }
+
   public function createWorkflow(Workflow $workflow): int {
     $result = $this->wpdb->insert($this->workflowTable, $this->getWorkflowHeaderData($workflow));
     if (!$result) {

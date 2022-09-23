@@ -27,6 +27,11 @@ class WorkflowRunStorage {
     $this->subjectLoader = $subjectLoader;
   }
 
+  public function truncate(): void {
+    $table = esc_sql($this->table);
+    $this->wpdb->query("truncate $table");
+  }
+
   public function createWorkflowRun(WorkflowRun $workflowRun): int {
     $result = $this->wpdb->insert($this->table, $workflowRun->toArray());
     if ($result === false) {
