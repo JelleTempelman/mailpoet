@@ -425,13 +425,15 @@ jobs:
               --xml
               -g circleci_split_group
             )
-            docker-compose run -e SKIP_DEPS=1 \
+            cmd="docker-compose run -e SKIP_DEPS=1 \
             -e CIRCLE_BRANCH=${CIRCLE_BRANCH} \
             -e CIRCLE_JOB=${CIRCLE_JOB} \
             -e MULTISITE=<< parameters.multisite >> \
             -e ENABLE_COT=<< parameters.enable_cot >> \
             -e ENABLE_COT_SYNC=<< parameters.enable_cot_sync >> \
-            codeception_acceptance "${args[@]}"
+            codeception_acceptance \"${args[@]}\""
+            echo $cmd
+            eval "$cmd" | tee ./dc_out.txt || (cat ./dc_out.txt | grep 'Error response from daemon: Conflict. The container name' && eval "$cmd")
       - run:
           name: Check exceptions
           command: |
