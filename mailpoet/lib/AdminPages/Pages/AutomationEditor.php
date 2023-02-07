@@ -2,6 +2,8 @@
 
 namespace MailPoet\AdminPages\Pages;
 
+use AutomateWoo\Fields\Field;
+use AutomateWoo\Trigger;
 use MailPoet\AdminPages\PageRenderer;
 use MailPoet\Automation\Engine\Data\Automation;
 use MailPoet\Automation\Engine\Hooks;
@@ -70,6 +72,30 @@ class AutomationEditor {
       exit();
     }
 
+    $automateWooTriggers = array_map(
+      function(Trigger $trigger) : array {
+        return [
+          'key' => $trigger->get_name(),
+          'name' => $trigger->get_title(),
+          'description' => $trigger->get_description(),
+          'fields' => array_map(
+            function(Field $field) : array {
+              return [
+                'name' => $field->get_name(),
+                'label' => $field->get_title(),
+                'type' => $field->get_type(),
+                'options' => method_exists($field, 'get_options') ? $field->get_options() : [],
+                'description' => $field->get_description(),
+                'placeholder' => $field->get_placeholder(),
+                'required' => $field->get_required(),
+              ];
+            },
+            $trigger->get_fields()),
+        ];
+      },
+      $this->getAutomateWooTriggers()
+    );
+
     $roles = new \WP_Roles();
     $this->pageRenderer->displayPage('automation/editor.html', [
       'registry' => $this->buildRegistry(),
@@ -85,6 +111,7 @@ class AutomationEditor {
         'root' => rtrim($this->wp->escUrlRaw(admin_url('admin-ajax.php')), '/'),
       ],
       'user_roles' => $roles->get_names(),
+      'automateWooTriggers' => $automateWooTriggers,
     ]);
   }
 
@@ -106,5 +133,13 @@ class AutomationEditor {
       $data[$key] = $factory();
     }
     return $data;
+  }
+
+  private function getAutomateWooTriggers() {
+    $triggers = [];
+    if (class_exists('AutomateWoo\Triggers')) {
+      $triggers = \AutomateWoo\Triggers::get_all();
+    }
+    return $triggers;
   }
 }

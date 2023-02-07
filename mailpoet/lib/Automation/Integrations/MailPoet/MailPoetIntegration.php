@@ -4,6 +4,7 @@ namespace MailPoet\Automation\Integrations\MailPoet;
 
 use MailPoet\Automation\Engine\Integration;
 use MailPoet\Automation\Engine\Registry;
+use MailPoet\Automation\Integrations\AutomateWoo\Triggers\AutomateWooTrigger;
 use MailPoet\Automation\Integrations\MailPoet\Actions\SendEmailAction;
 use MailPoet\Automation\Integrations\MailPoet\Hooks\AutomationEditorLoadingHooks;
 use MailPoet\Automation\Integrations\MailPoet\Subjects\SegmentSubject;
@@ -27,6 +28,9 @@ class MailPoetIntegration implements Integration {
   /** @var UserRegistrationTrigger  */
   private $userRegistrationTrigger;
 
+  /** @var AutomateWooTrigger  */
+  private $automateWooTrigger;
+
   /** @var SendEmailAction */
   private $sendEmailAction;
 
@@ -38,6 +42,7 @@ class MailPoetIntegration implements Integration {
     SubscriberSubject $subscriberSubject,
     SomeoneSubscribesTrigger $someoneSubscribesTrigger,
     UserRegistrationTrigger $userRegistrationTrigger,
+    AutomateWooTrigger $automateWooTrigger,
     SendEmailAction $sendEmailAction,
     AutomationEditorLoadingHooks $automationEditorLoadingHooks
   ) {
@@ -46,6 +51,7 @@ class MailPoetIntegration implements Integration {
     $this->subscriberSubject = $subscriberSubject;
     $this->someoneSubscribesTrigger = $someoneSubscribesTrigger;
     $this->userRegistrationTrigger = $userRegistrationTrigger;
+    $this->automateWooTrigger = $automateWooTrigger;
     $this->sendEmailAction = $sendEmailAction;
     $this->automationEditorLoadingHooks = $automationEditorLoadingHooks;
   }
@@ -59,6 +65,7 @@ class MailPoetIntegration implements Integration {
     $registry->addSubject($this->subscriberSubject);
     $registry->addTrigger($this->someoneSubscribesTrigger);
     $registry->addTrigger($this->userRegistrationTrigger);
+    $registry->addTrigger($this->automateWooTrigger);
     $registry->addAction($this->sendEmailAction);
 
     // sync step args (subject, preheader, etc.) to email settings
