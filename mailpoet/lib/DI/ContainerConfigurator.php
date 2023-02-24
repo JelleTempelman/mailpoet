@@ -164,6 +164,7 @@ class ContainerConfigurator implements IContainerConfigurator {
     $container->autowire(\MailPoet\Automation\Integrations\MailPoet\Hooks\AutomationEditorLoadingHooks::class)->setPublic(true);
     // Automation - AutomateWoo integration
     $container->autowire(\MailPoet\Automation\Integrations\AutomateWoo\AutomateWooIntegration::class)->setPublic(true);
+    $container->autowire(\MailPoet\Automation\Integrations\AutomateWoo\BatchedDailyTriggerHandler::class)->setPublic(true);
     $container->autowire(\MailPoet\Automation\Integrations\AutomateWoo\BatchedDailyTriggerScheduler::class)->setPublic(true);
     $container->autowire(\MailPoet\Automation\Integrations\AutomateWoo\Triggers\AutomateWooTrigger::class)->setPublic(true);
     // Config

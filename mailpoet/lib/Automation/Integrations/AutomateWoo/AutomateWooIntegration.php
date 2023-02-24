@@ -13,12 +13,17 @@ class AutomateWooIntegration implements Integration {
   /** @var BatchedDailyTriggerScheduler */
   private $batchedDailyTriggerScheduler;
 
+  /** @var BatchedDailyTriggerHandler */
+  private $batchedDailyTriggerHandler;
+
   public function __construct(
     AutomateWooTrigger $automateWooTrigger,
-    BatchedDailyTriggerScheduler $batchedDailyTriggerScheduler
+    BatchedDailyTriggerScheduler $batchedDailyTriggerScheduler,
+    BatchedDailyTriggerHandler $batchedDailyTriggerHandler
   ) {
     $this->automateWooTrigger = $automateWooTrigger;
     $this->batchedDailyTriggerScheduler = $batchedDailyTriggerScheduler;
+    $this->batchedDailyTriggerHandler = $batchedDailyTriggerHandler;
   }
 
   public function register(Registry $registry): void {
@@ -28,5 +33,7 @@ class AutomateWooIntegration implements Integration {
       [$this->batchedDailyTriggerScheduler, 'processTrigger'],
       $this->automateWooTrigger->getKey()
     );
+
+    $this->batchedDailyTriggerHandler->initialize();
   }
 }
