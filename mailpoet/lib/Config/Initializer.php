@@ -7,6 +7,7 @@ use MailPoet\API\REST\API as RestApi;
 use MailPoet\AutomaticEmails\AutomaticEmails;
 use MailPoet\Automation\Engine\Engine;
 use MailPoet\Automation\Engine\Hooks as AutomationHooks;
+use MailPoet\Automation\Integrations\AutomateWoo\AutomateWooIntegration;
 use MailPoet\Automation\Integrations\MailPoet\MailPoetIntegration;
 use MailPoet\Cron\CronTrigger;
 use MailPoet\Cron\DaemonActionSchedulerRunner;
@@ -107,6 +108,9 @@ class Initializer {
   /** @var MailPoetIntegration */
   private $automationMailPoetIntegration;
 
+  /** @var AutomateWooIntegration */
+  private $automationAutomateWooIntegration;
+
   /** @var PersonalDataExporters */
   private $personalDataExporters;
 
@@ -144,6 +148,7 @@ class Initializer {
     AssetsLoader $assetsLoader,
     Engine $automationEngine,
     MailPoetIntegration $automationMailPoetIntegration,
+    AutomateWooIntegration $automationAutomateWooIntegration,
     PersonalDataExporters $personalDataExporters,
     DaemonActionSchedulerRunner $actionSchedulerRunner
   ) {
@@ -173,6 +178,7 @@ class Initializer {
     $this->assetsLoader = $assetsLoader;
     $this->automationEngine = $automationEngine;
     $this->automationMailPoetIntegration = $automationMailPoetIntegration;
+    $this->automationAutomateWooIntegration = $automationAutomateWooIntegration;
     $this->personalDataExporters = $personalDataExporters;
     $this->actionSchedulerRunner = $actionSchedulerRunner;
   }
@@ -252,6 +258,11 @@ class Initializer {
 
     WPFunctions::get()->addAction(AutomationHooks::INITIALIZE, [
       $this->automationMailPoetIntegration,
+      'register',
+    ]);
+
+    WPFunctions::get()->addAction(AutomationHooks::INITIALIZE, [
+      $this->automationAutomateWooIntegration,
       'register',
     ]);
 
