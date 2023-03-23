@@ -148,3 +148,12 @@ function mailpoet_core_dependency_notice() {
 
 // Initialize plugin
 require_once($mailpoetPlugin['initializer']);
+
+add_action('admin_init', function() {
+  if (isset($_REQUEST['insert_brand_template'])) {
+    global $wpdb;
+    $newsletterTemplatesTable = $wpdb->prefix . 'mailpoet_newsletter_templates';
+    $templateData = (new \MailPoet\Config\PopulatorData\Templates\BrandTemplate(\MailPoet\Config\Env::$assetsUrl))->get();
+    $wpdb->insert($newsletterTemplatesTable, $templateData);
+  }
+});
