@@ -36,6 +36,18 @@ class BrandTemplate {
     $linkFontColor = $wpThemeStyles['elements']['link']['color']['text'] ?? '#000000';
     $backgroundColor = $wpThemeStyles['color']['background'] ?? '#ffffff';
 
+    if (has_custom_logo()) {
+      $logo_id = get_theme_mod('custom_logo');
+      $logo = wp_get_attachment_image_src($logo_id, [150, 150]);
+      $logoUrl = $logo[0];
+      $logoWidth = $logo[1] . 'px';
+      $logoHeight = $logo[2] . 'px';
+    } else {
+      $logoUrl = $this->template_image_url . "/fake-logo.png";
+      $logoWidth = "598px";
+      $logoHeight = "71px";
+    }
+
     return [
       "content" => [
         "type" => "container",
@@ -76,11 +88,11 @@ class BrandTemplate {
                   [
                     "type" => "image",
                     "link" => "",
-                    "src" => $this->template_image_url . "/fake-logo.png",
+                    "src" => $logoUrl,
                     "alt" => __("Fake logo", 'mailpoet'),
                     "fullWidth" => false,
-                    "width" => "598px",
-                    "height" => "71px",
+                    "width" => $logoWidth,
+                    "height" => $logoHeight,
                     "styles" => [
                       "block" => [
                         "textAlign" => "center",
