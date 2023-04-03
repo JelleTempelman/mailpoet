@@ -1,6 +1,9 @@
 <?php // phpcs:ignore SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing
 namespace MailPoet\Config\PopulatorData\Templates;
 
+use MailPoet\DI\ContainerWrapper;
+use MailPoet\Entities\NewsletterEntity;
+use MailPoet\Newsletter\Renderer\Renderer;
 use MailPoet\WP\Functions as WPFunctions;
 
 class BrandTemplate {
@@ -20,11 +23,19 @@ class BrandTemplate {
   public function get() {
     return [
       'name' => __("Brand template", 'mailpoet'),
-      'categories' => json_encode(['standard', 'blank']),
+      'categories' => json_encode(['standard', 'blank', 'brand']),
       'readonly' => 1,
       'thumbnail' => $this->getThumbnail(),
       'body' => json_encode($this->getBody()),
     ];
+  }
+
+  public function getHTML() {
+    $renderer = ContainerWrapper::getInstance()->get(Renderer::class);
+    $newsletter = new NewsletterEntity();
+    $newsletter->setBody($this->getBody());
+    $result = $renderer->render($newsletter);
+    return $result['html'];
   }
 
   private function getBody() {

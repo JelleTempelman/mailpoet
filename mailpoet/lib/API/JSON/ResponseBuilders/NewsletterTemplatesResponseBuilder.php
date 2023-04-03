@@ -27,6 +27,8 @@ class NewsletterTemplatesResponseBuilder {
    */
   public function buildForListing(array $newsletterTemplates): array {
     $data = [];
+    $brandTemplate = (new \MailPoet\Config\PopulatorData\Templates\BrandTemplate(\MailPoet\Config\Env::$assetsUrl));
+
     foreach ($newsletterTemplates as $template) {
       $data[] = [
         'id' => $template->getId(),
@@ -34,6 +36,7 @@ class NewsletterTemplatesResponseBuilder {
         'thumbnail' => $template->getThumbnail(),
         'name' => $template->getName(),
         'readonly' => $template->getReadonly(),
+        'html' => strpos($template->getCategories(), 'brand') !== false ? $brandTemplate->getHTML() : "",
       ];
     }
     return $data;
