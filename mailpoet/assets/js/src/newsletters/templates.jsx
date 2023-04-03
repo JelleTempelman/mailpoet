@@ -316,6 +316,7 @@ class NewsletterTemplates extends Component {
             id={template.id}
             name={template.name}
             thumbnail={template.thumbnail}
+            html={template.html}
             readonly={template.readonly}
           />
         ));

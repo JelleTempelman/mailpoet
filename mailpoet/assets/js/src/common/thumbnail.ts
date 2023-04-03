@@ -95,3 +95,30 @@ export const fromNewsletter = (data) =>
       })
       .fail((response) => reject(response.errors));
   });
+
+export const fromHtml = (html) =>
+  new Promise((resolve, reject) => {
+    const iframe = document.createElement('iframe');
+    iframe.style.opacity = '0';
+    // disable scrolling in iframe as iframe.scrolling is deprecated
+    iframe.style.overflow = 'hidden';
+    iframe.onload = async () => {
+      const container = iframe.contentDocument.documentElement;
+      container.style.padding = '10px 20px';
+      try {
+        const image = await fromDom(container);
+        document.body.removeChild(iframe);
+        resolve(image);
+      } catch (err) {
+        document.body.removeChild(iframe);
+        reject(
+          __(
+            'An error occurred while saving the template in "Recently sent"',
+            'mailpoet',
+          ),
+        );
+      }
+    };
+    iframe.srcdoc = html;
+    document.body.appendChild(iframe);
+  });

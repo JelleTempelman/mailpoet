@@ -7,6 +7,7 @@ import { Button } from 'common/button/button';
 import { TemplateBox as TemplateBoxWrap } from 'common/template_box/template_box';
 import { confirmAlert } from 'common/confirm_alert.jsx';
 import { GlobalContext } from 'context';
+import { fromHtml } from '../../common';
 
 /**
  * props = {
@@ -101,9 +102,15 @@ class TemplateBox extends Component {
   }
 
   render() {
-    const { index, name, thumbnail, readonly } = this.props;
+    const { index, name, thumbnail, readonly, html } = this.props;
 
     let preview = '';
+    if (html) {
+      // eslint-disable-next-line no-unused-vars
+      fromHtml(html).then((image) => {
+        // render preview asynchronously, when the image is loaded, but show spinner until then
+      });
+    }
     if (typeof thumbnail === 'string' && thumbnail.length > 0) {
       preview = (
         <a
@@ -159,10 +166,12 @@ TemplateBox.propTypes = {
   afterDelete: PropTypes.func.isRequired,
   beforeSelect: PropTypes.func.isRequired,
   afterSelect: PropTypes.func.isRequired,
+  html: PropTypes.string,
 };
 
 TemplateBox.defaultProps = {
   thumbnail: null,
+  html: null,
 };
 TemplateBox.displayName = 'TemplateBox';
 export { TemplateBox };
