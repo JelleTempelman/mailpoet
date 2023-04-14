@@ -120,7 +120,7 @@ class BridgeTest extends \MailPoetTest {
       $state = ['state' => $state];
       $this->bridge->storeMSSKeyAndState($key, $state);
       expect($this->getMSSKey())->equals($key);
-      expect($this->getMSSKeyState())->equals($state);
+      expect($this->bridge->getMssKeyState())->equals($state);
     }
   }
 
@@ -132,7 +132,7 @@ class BridgeTest extends \MailPoetTest {
     foreach ($states as $state) {
       $this->bridge->storeMSSKeyAndState($this->validKey, $state);
       expect($this->getMSSKey())->notEquals($this->validKey);
-      expect($this->getMSSKeyState())->notEquals($state);
+      expect($this->bridge->getMssKeyState())->notEquals($state);
     }
   }
 
@@ -186,7 +186,7 @@ class BridgeTest extends \MailPoetTest {
       $state = ['state' => $state];
       $this->bridge->storePremiumKeyAndState($key, $state);
       expect($this->getPremiumKey())->equals($key);
-      expect($this->getPremiumKeyState())->equals($state);
+      expect($this->bridge->getPremiumKeyState())->equals($state);
     }
   }
 
@@ -198,7 +198,7 @@ class BridgeTest extends \MailPoetTest {
     foreach ($states as $state) {
       $this->bridge->storePremiumKeyAndState($this->validKey, $state);
       expect($this->getPremiumKey())->notEquals($this->validKey);
-      expect($this->getPremiumKeyState())->notEquals($state);
+      expect($this->bridge->getPremiumKeyState())->notEquals($state);
     }
   }
 

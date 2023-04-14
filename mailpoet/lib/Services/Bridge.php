@@ -287,9 +287,33 @@ class Bridge {
 
     // store the key state
     $this->settings->set(
-      $keyStateSettingName,
+      $this->getKeyStateSettingsKey((string)$key, $keyStateSettingName),
       $state
     );
+  }
+
+  public function getPremiumKeyState(): ?array {
+    return $this->getKeyState(API::KEY_CHECK_TYPE_PREMIUM);
+  }
+
+  public function getMssKeyState(): ?array {
+    return $this->getKeyState(API::KEY_CHECK_TYPE_MSS);
+  }
+
+  private function getKeyState(string $keyType): ?array {
+    if ($keyType === API::KEY_CHECK_TYPE_PREMIUM) {
+      $keySettingName = self::PREMIUM_KEY_SETTING_NAME;
+      $keyStateSettingName = self::PREMIUM_KEY_STATE_SETTING_NAME;
+    } else {
+      $keySettingName = self::API_KEY_SETTING_NAME;
+      $keyStateSettingName = self::API_KEY_STATE_SETTING_NAME;
+    }
+    $key = (string)$this->settings->get($keySettingName, '');
+    return $this->settings->get($this->getKeyStateSettingsKey($key, $keyStateSettingName), null);
+  }
+
+  private function getKeyStateSettingsKey(string $key, string $prefix): string {
+    return $prefix . '.' . md5($key);
   }
 
   private function buildKeyState($keyState, $result, ?string $accessRestriction): array {
