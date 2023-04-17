@@ -14,11 +14,16 @@ class Settings {
   /** @var SettingsController */
   private $settings;
 
+  /** @var AuthorizedEmailsController  */
   private $authorizedEmailsController;
+
+  /** @var Bridge  */
+  private $bridge;
 
   public function __construct() {
     $this->settings = SettingsController::getInstance();
     $this->authorizedEmailsController = ContainerWrapper::getInstance()->get(AuthorizedEmailsController::class);
+    $this->bridge = ContainerWrapper::getInstance()->get(Bridge::class);
     $this->settings->resetCache();
   }
 
@@ -122,27 +127,23 @@ class Settings {
     $mailPoetSendingKey = getenv('WP_TEST_MAILER_MAILPOET_API');
     $this->settings->set('mta_group', 'mailpoet');
     $this->settings->set('mta.method', 'MailPoet');
-    $this->settings->set('mta.mailpoet_api_key', $mailPoetSendingKey);
-    $this->settings->set('mta.mailpoet_api_key_state.state', 'valid');
-    $this->settings->set('mta.mailpoet_api_key_state.code', 200);
+    $this->withValidMssKey($mailPoetSendingKey);
     $this->authorizedEmailsController->checkAuthorizedEmailAddresses();
     return $this;
   }
 
   public function withValidPremiumKey($key) {
-    $this->settings->set(Bridge::PREMIUM_KEY_SETTING_NAME, $key);
-    $this->settings->set(Bridge::PREMIUM_KEY_STATE_SETTING_NAME, ['state' => Bridge::PREMIUM_KEY_VALID, 'code' => 200]);
+    $this->bridge->storePremiumKeyAndState($key, ['state' => Bridge::PREMIUM_KEY_VALID, 'code' => 200]);
     return $this;
   }
 
-  public function withValidMssKey($key) {
-    $this->settings->set(Bridge::API_KEY_SETTING_NAME, $key);
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME, ['state' => Bridge::KEY_VALID, 'code' => 200]);
+  public function withValidMssKey($key, $data = []) {
+    $this->bridge->storeMSSKeyAndState($key, ['state' => Bridge::KEY_VALID, 'code' => 200, 'data' => $data]);
     return $this;
   }
 
-  public function withMssKeyPendingApproval() {
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME . '.data.is_approved', false);
+  public function withMssKeyPendingApproval(string $key = 'key-pending-approval') {
+    $this->bridge->storeMSSKeyAndState($key, ['state' => Bridge::KEY_VALID, 'code' => 200, 'data' => ['is_approved' => false]]);
     return $this;
   }
 
@@ -251,7 +252,8 @@ class Settings {
   }
 
   public function withApprovedMssKey() {
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME . '.data.is_approved', true);
+    $mailPoetSendingKey = getenv('WP_TEST_MAILER_MAILPOET_API');
+    $this->withValidMssKey($mailPoetSendingKey, ['is_approved' => true]);
     return $this;
   }
 }
