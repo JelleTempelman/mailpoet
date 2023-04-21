@@ -30,6 +30,43 @@ class ApiDataSanitizerTest extends \MailPoetTest {
           'link' => '',
           'text' => 'http://some.url/wp-c\'"><img src=x onerror=alert(2)>ontent/fake-logo.png',
         ],
+        [
+          'type' => 'image',
+          'link' => 'javascript:alert(1)',
+          'src' => 'http://some.url/wp-content/fake-image.png',
+        ],
+        [
+          'type' => 'social',
+          'iconSet' => 'default',
+          'icons' => [
+            [
+              'type' => 'socialIcon',
+              'iconType' => 'facebook',
+              'link' => 'javascript:alert(1)',
+              'height' => '32px',
+              'width' => '32px',
+              'text' => 'Facebook',
+            ],
+            [
+              'type' => 'socialIcon',
+              'iconType' => 'twitter',
+              'link' => 'https://example.com/',
+              'height' => '32px',
+              'width' => '32px',
+              'text' => 'Facebook',
+            ],
+          ],
+        ],
+        [
+          'type' => 'image',
+          'link' => '[activation_link]',
+          'src' => 'http://some.url/wp-content/fake-image.png',
+        ],
+        [
+          'type' => 'image',
+          'link' => '[link:custom arg1="1" arg2="2"]',
+          'src' => 'http://some.url/wp-content/fake-image.png',
+        ],
       ],
     ],
   ];
@@ -53,5 +90,17 @@ class ApiDataSanitizerTest extends \MailPoetTest {
     expect($image['type'])->equals('header');
     expect($image['link'])->equals('');
     expect($image['text'])->equals('http://some.url/wp-c\'"&gt;ontent/fake-logo.png');
+    $imageAlert = $result['content']['blocks'][2];
+    expect($imageAlert['type'])->equals('image');
+    expect($imageAlert['link'])->equals('');
+    $socialIcons = $result['content']['blocks'][3];
+    expect($socialIcons['type'])->equals('social');
+    expect($socialIcons['icons'][0]['type'])->equals('socialIcon');
+    expect($socialIcons['icons'][0]['link'])->equals('');
+    expect($socialIcons['icons'][1]['link'])->equals('https://example.com/');
+    $shortCodeLink1 = $result['content']['blocks'][4];
+    expect($shortCodeLink1['link'])->equals('[activation_link]');
+    $shortCodeLink2 = $result['content']['blocks'][5];
+    expect($shortCodeLink2['link'])->equals('[link:custom arg1="1" arg2="2"]');
   }
 }

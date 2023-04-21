@@ -34,4 +34,11 @@ class NewsletterHtmlSanitizerTest extends \MailPoetTest {
     expect($this->sanitizer->sanitize('<p>Thanks<img src=x onerror=alert(4)> See you soon!</p>'))->equals('<p>Thanks See you soon!</p>');
     expect($this->sanitizer->sanitize('<img class="wp-image-55" style="width: 150px;height: 1px" src="http://test.com/logo-1.jpg" alt="alt text">'))->equals('');
   }
+
+  public function testItSanitizesUrl() {
+    expect($this->sanitizer->sanitizeURL('[shortcode arg="1"]'))->equals('[shortcode arg="1"]');
+    expect($this->sanitizer->sanitizeURL('javascript:alert(1)'))->equals('');
+    expect($this->sanitizer->sanitizeURL('example.com'))->equals('http://example.com');
+    expect($this->sanitizer->sanitizeURL('https://example.com?arg=1&arg2[]=test'))->equals('https://example.com?arg=1&arg2%5B%5D=test');
+  }
 }

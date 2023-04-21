@@ -120,6 +120,13 @@ class NewsletterHtmlSanitizer {
   }
 
   public function sanitizeURL(string $url): string {
-    return $this->wp->escUrlRaw($url);
+    // Check if the URL is a shortcode
+    preg_match('/^\[(\[?)(.+?)(\]?)\]$/', $url, $matches);
+    if (!empty($matches)) {
+      // We process only known shortcodes and unknown are rendered as an empty string
+      return $matches[0];
+    } else {
+      return $this->wp->escUrlRaw($url);
+    }
   }
 }
