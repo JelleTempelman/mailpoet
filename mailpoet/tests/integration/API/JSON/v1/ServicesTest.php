@@ -16,19 +16,25 @@ use MailPoet\Services\AuthorizedSenderDomainController;
 use MailPoet\Services\Bridge;
 use MailPoet\Services\CongratulatoryMssEmailController;
 use MailPoet\Settings\SettingsController;
+use MailPoet\Test\DataFactories\Settings;
 use MailPoet\WP\Functions as WPFunctions;
 
 class ServicesTest extends \MailPoetTest {
   public $data;
   public $servicesEndpoint;
+
   /** @var SettingsController */
   private $settings;
+
+  /** @var Settings */
+  private $settingsFactory;
 
   public function _before() {
     parent::_before();
     $this->servicesEndpoint = $this->diContainer->get(Services::class);
     $this->data = ['key' => '1234567890abcdef'];
     $this->settings = SettingsController::getInstance();
+    $this->settingsFactory = new Settings();
   }
 
   public function testItRespondsWithErrorIfNoMSSKeyIsGiven() {
@@ -198,8 +204,7 @@ class ServicesTest extends \MailPoetTest {
 
   public function testItResumesSendingWhenMSSKeyBecomesApproved() {
     $this->settings->set(Mailer::MAILER_CONFIG_SETTING_NAME, ['method' => Mailer::METHOD_MAILPOET]);
-    $this->settings->set(Bridge::API_KEY_SETTING_NAME, 'key');
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME, [
+    $this->settingsFactory->withMssKeyAndState('key', [
       'state' => Bridge::KEY_VALID,
       'data' => ['is_approved' => false],
     ]);

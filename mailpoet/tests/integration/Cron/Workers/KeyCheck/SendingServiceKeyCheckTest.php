@@ -10,6 +10,7 @@ use MailPoet\Mailer\Mailer;
 use MailPoet\Mailer\MailerLog;
 use MailPoet\Services\Bridge;
 use MailPoet\Settings\SettingsController;
+use MailPoet\Test\DataFactories\Settings;
 use MailPoetVendor\Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -43,8 +44,8 @@ class SendingServiceKeyCheckTest extends \MailPoetTest {
     // when pending key approval, next run is scheduled in an hour
     $settings = $this->diContainer->get(SettingsController::class);
     $settings->set(Mailer::MAILER_CONFIG_SETTING_NAME, ['method' => Mailer::METHOD_MAILPOET]);
-    $settings->set(Bridge::API_KEY_SETTING_NAME, 'key');
-    $settings->set(Bridge::API_KEY_STATE_SETTING_NAME, [
+    $settingsFactory = new Settings();
+    $settingsFactory->withMssKeyAndState('key', [
       'state' => Bridge::KEY_VALID,
       'data' => ['is_approved' => false],
     ]);

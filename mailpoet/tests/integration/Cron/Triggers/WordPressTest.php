@@ -30,6 +30,7 @@ use MailPoet\Tasks\Sending;
 use MailPoet\Test\DataFactories\Newsletter as NewsletterFactory;
 use MailPoet\Test\DataFactories\ScheduledTask as ScheduledTaskFactory;
 use MailPoet\Test\DataFactories\SendingQueue as SendingQueueFactory;
+use MailPoet\Test\DataFactories\Settings;
 use MailPoet\WP\Functions as WPFunctions;
 use MailPoetVendor\Carbon\Carbon;
 
@@ -40,6 +41,9 @@ class WordPressTest extends \MailPoetTest {
 
   /** @var WordPress */
   private $wordpressTrigger;
+
+  /** @var Settings */
+  private $settingsFactory;
 
   public function _before() {
     parent::_before();
@@ -56,6 +60,7 @@ class WordPressTest extends \MailPoetTest {
     $this->addScheduledTask(Beamer::TASK_TYPE, ScheduledTaskEntity::STATUS_SCHEDULED, $future);
     $this->addScheduledTask(SubscribersStatsReport::TASK_TYPE, ScheduledTaskEntity::STATUS_SCHEDULED, $future);
     $this->wordpressTrigger = $this->diContainer->get(WordPress::class);
+    $this->settingsFactory = new Settings();
   }
 
   public function testItDoesNotRunIfRunIntervalIsNotElapsed() {
@@ -189,8 +194,7 @@ class WordPressTest extends \MailPoetTest {
     expect($this->settings->get(CronHelper::DAEMON_SETTING))->null();
     $scheduledTaskTable = $this->entityManager->getClassMetadata(ScheduledTaskEntity::class)->getTableName();
     $this->entityManager->getConnection()->executeStatement("DELETE FROM $scheduledTaskTable WHERE type = '$statsJobType';");
-    $this->settings->set(Bridge::API_KEY_SETTING_NAME, 'asdfgh');
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME, ['state' => 'valid']);
+    $this->settingsFactory->withMssKeyAndState('asdfgh', ['state' => Bridge::KEY_VALID]);
     expect($this->wordpressTrigger->checkExecutionRequirements())->true();
     $this->addScheduledTask(SubscribersStatsReport::TASK_TYPE, ScheduledTaskEntity::STATUS_SCHEDULED, $future);
     expect($this->wordpressTrigger->checkExecutionRequirements())->false();
@@ -201,9 +205,8 @@ class WordPressTest extends \MailPoetTest {
     expect($this->settings->get(CronHelper::DAEMON_SETTING))->null();
     $scheduledTaskTable = $this->entityManager->getClassMetadata(ScheduledTaskEntity::class)->getTableName();
     $this->entityManager->getConnection()->executeStatement("DELETE FROM $scheduledTaskTable WHERE type = '$statsJobType';");
-    $this->settings->set(Bridge::API_KEY_SETTING_NAME, 'somekey');
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME, ['state' => 'invalid']);
-    $this->settings->set(Bridge::PREMIUM_KEY_SETTING_NAME, null);
+    $this->settingsFactory->withMssKeyAndState('somekey', ['state' => Bridge::KEY_INVALID]);
+    $this->settingsFactory->withPremiumKeyAndState(null, null);
     expect($this->wordpressTrigger->checkExecutionRequirements())->false();
   }
 
@@ -212,8 +215,7 @@ class WordPressTest extends \MailPoetTest {
     expect($this->settings->get(CronHelper::DAEMON_SETTING))->null();
     $scheduledTaskTable = $this->entityManager->getClassMetadata(ScheduledTaskEntity::class)->getTableName();
     $this->entityManager->getConnection()->executeStatement("DELETE FROM $scheduledTaskTable WHERE type = '$statsJobType';");
-    $this->settings->set(Bridge::API_KEY_SETTING_NAME, 'somekey');
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME, ['state' => 'valid']);
+    $this->settingsFactory->withMssKeyAndState('somekey', ['state' => Bridge::KEY_VALID]);
     expect($this->wordpressTrigger->checkExecutionRequirements())->true();
   }
 

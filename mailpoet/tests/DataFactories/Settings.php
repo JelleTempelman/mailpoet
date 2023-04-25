@@ -142,14 +142,14 @@ class Settings {
     return $this;
   }
 
-  public function withPremiumKeyAndState(string $key, $state) {
+  public function withPremiumKeyAndState(?string $key, $state) {
     $this->settings->set(Bridge::PREMIUM_KEY_SETTING_NAME, $key);
-    $this->settings->set(Bridge::PREMIUM_KEY_STATE_SETTING_NAME . '.' . md5($key), $state);
+    $this->settings->set(Bridge::PREMIUM_KEY_STATE_SETTING_NAME . '.' . md5($key ?? ''), $state);
   }
 
-  public function withMssKeyAndState(string $key, $state) {
+  public function withMssKeyAndState(?string $key, $state) {
     $this->settings->set(Bridge::API_KEY_SETTING_NAME, $key);
-    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME . '.' . md5($key), $state);
+    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME . '.' . md5($key ?? ''), $state);
   }
 
   public function withMssKeyPendingApproval(string $key = 'key-pending-approval') {
