@@ -142,6 +142,16 @@ class Settings {
     return $this;
   }
 
+  public function withPremiumKeyAndState(string $key, $state) {
+    $this->settings->set(Bridge::PREMIUM_KEY_SETTING_NAME, $key);
+    $this->settings->set(Bridge::PREMIUM_KEY_STATE_SETTING_NAME . '.' . md5($key), $state);
+  }
+
+  public function withMssKeyAndState(string $key, $state) {
+    $this->settings->set(Bridge::API_KEY_SETTING_NAME, $key);
+    $this->settings->set(Bridge::API_KEY_STATE_SETTING_NAME . '.' . md5($key), $state);
+  }
+
   public function withMssKeyPendingApproval(string $key = 'key-pending-approval') {
     $this->bridge->storeMSSKeyAndState($key, ['state' => Bridge::KEY_VALID, 'code' => 200, 'data' => ['is_approved' => false]]);
     return $this;
