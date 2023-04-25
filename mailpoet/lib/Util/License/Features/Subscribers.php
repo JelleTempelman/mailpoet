@@ -11,14 +11,6 @@ class Subscribers {
   const SUBSCRIBERS_OLD_LIMIT = 2000;
   const SUBSCRIBERS_NEW_LIMIT = 1000;
   const NEW_LIMIT_DATE = '2019-11-00';
-  const MSS_KEY_STATE = 'mta.mailpoet_api_key_state.state';
-  const MSS_SUBSCRIBERS_LIMIT_SETTING_KEY = 'mta.mailpoet_api_key_state.data.site_active_subscriber_limit';
-  const MSS_SUPPORT_SETTING_KEY = 'mta.mailpoet_api_key_state.data.support_tier';
-  const PREMIUM_KEY_STATE = 'premium.premium_key_state.state';
-  const PREMIUM_SUBSCRIBERS_LIMIT_SETTING_KEY = 'premium.premium_key_state.data.site_active_subscriber_limit';
-  const PREMIUM_EMAIL_VOLUME_LIMIT_SETTING_KEY = 'premium.premium_key_state.data.email_volume_limit';
-  const PREMIUM_EMAILS_SENT_SETTING_KEY = 'premium.premium_key_state.data.emails_sent';
-  const PREMIUM_SUPPORT_SETTING_KEY = 'premium.premium_key_state.data.support_tier';
   const SUBSCRIBERS_COUNT_CACHE_KEY = 'mailpoet_subscribers_count';
   const SUBSCRIBERS_COUNT_CACHE_EXPIRATION_MINUTES = 60;
   const SUBSCRIBERS_COUNT_CACHE_MIN_VALUE = 1000;
@@ -32,14 +24,19 @@ class Subscribers {
   /** @var WPFunctions */
   private $wp;
 
+  /** @var Bridge */
+  private $bridge;
+
   public function __construct(
     SettingsController $settings,
     SubscribersRepository $subscribersRepository,
-    WPFunctions $wp
+    WPFunctions $wp,
+    Bridge $bridge
   ) {
     $this->settings = $settings;
     $this->subscribersRepository = $subscribersRepository;
     $this->wp = $wp;
+    $this->bridge = $bridge;
   }
 
   public function check(): bool {
@@ -93,45 +90,61 @@ class Subscribers {
   }
 
   public function getEmailVolumeLimit(): int {
-    return (int)$this->settings->get(self::PREMIUM_EMAIL_VOLUME_LIMIT_SETTING_KEY);
+    $stateData = $this->bridge->getPremiumKeyState();
+    return (int)($stateData['data']['email_volume_limit'] ?? null);
   }
 
   public function getEmailsSent(): int {
-    return (int)$this->settings->get(self::PREMIUM_EMAILS_SENT_SETTING_KEY);
+    $stateData = $this->bridge->getPremiumKeyState();
+    return (int)($stateData['data']['emails_sent'] ?? null);
   }
 
   public function hasValidMssKey() {
-    $state = $this->settings->get(self::MSS_KEY_STATE);
+    $stateData = $this->bridge->getMssKeyState();
+    $state = $stateData['state'] ?? null;
     return $state === Bridge::KEY_VALID || $state === Bridge::KEY_EXPIRING;
   }
 
   private function hasMssSubscribersLimit() {
-    return !empty($this->settings->get(self::MSS_SUBSCRIBERS_LIMIT_SETTING_KEY));
+    return !empty($this->getMssSubscribersLimit());
   }
 
   private function getMssSubscribersLimit() {
-    return (int)$this->settings->get(self::MSS_SUBSCRIBERS_LIMIT_SETTING_KEY);
+    $stateData = $this->bridge->getMssKeyState() ?? [];
+    return (int)($stateData['data']['site_active_subscriber_limit'] ?? 0);
   }
 
   public function hasMssPremiumSupport() {
-    return $this->hasValidMssKey() && $this->settings->get(self::MSS_SUPPORT_SETTING_KEY) === 'premium';
+    if (!$this->hasValidMssKey()) {
+      return false;
+    }
+    $stateData = $this->bridge->getMssKeyState() ?? [];
+    $supportTier = $stateData['data']['support_tier'] ?? null;
+    return $supportTier === 'premium';
   }
 
   public function hasValidPremiumKey() {
-    $state = $this->settings->get(self::PREMIUM_KEY_STATE);
+    $stateData = $this->bridge->getPremiumKeyState();
+    $state = $stateData['state'] ?? null;
     return $state === Bridge::KEY_VALID || $state === Bridge::KEY_EXPIRING;
   }
 
   private function hasPremiumSubscribersLimit() {
-    return !empty($this->settings->get(self::PREMIUM_SUBSCRIBERS_LIMIT_SETTING_KEY));
+    return !empty($this->getPremiumSubscribersLimit());
   }
 
   private function getPremiumSubscribersLimit() {
-    return (int)$this->settings->get(self::PREMIUM_SUBSCRIBERS_LIMIT_SETTING_KEY);
+    $stateData = $this->bridge->getPremiumKeyState() ?? [];
+    return (int)($stateData['data']['site_active_subscriber_limit'] ?? 0);
   }
 
   public function hasPremiumSupport() {
-    return $this->hasValidPremiumKey() && $this->settings->get(self::PREMIUM_SUPPORT_SETTING_KEY) === 'premium';
+    if (!$this->hasValidPremiumKey()) {
+      return false;
+    }
+    $stateData = $this->bridge->getPremiumKeyState() ?? [];
+    $supportTier = $stateData['data']['support_tier'] ?? null;
+    return $supportTier === 'premium';
   }
 
   private function getFreeSubscribersLimit() {

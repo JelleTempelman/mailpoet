@@ -3,6 +3,7 @@
 namespace MailPoet\Test\Util\License\Features;
 
 use Codeception\Util\Stub;
+use MailPoet\Services\Bridge;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Subscribers\SubscribersRepository;
 use MailPoet\Util\License\Features\Subscribers as SubscribersFeature;
@@ -172,11 +173,6 @@ class SubscribersTest extends \MailPoetUnitTest {
     $settings = Stub::make(SettingsController::class, [
       'get' => function($name) use($specs) {
         if ($name === 'installed_at') return $specs['installed_at'];
-        if ($name === SubscribersFeature::MSS_KEY_STATE) return $specs['mss_key_state'];
-        if ($name === SubscribersFeature::PREMIUM_KEY_STATE) return $specs['premium_key_state'];
-        if ($name === SubscribersFeature::PREMIUM_SUBSCRIBERS_LIMIT_SETTING_KEY) return $specs['premium_subscribers_limit'];
-        if ($name === SubscribersFeature::MSS_SUBSCRIBERS_LIMIT_SETTING_KEY) return $specs['mss_subscribers_limit'];
-        if ($name === SubscribersFeature::PREMIUM_SUPPORT_SETTING_KEY) return isset($specs['support_tier']) ? $specs['support_tier'] : 'free';
       },
     ]);
 
@@ -191,6 +187,22 @@ class SubscribersTest extends \MailPoetUnitTest {
       'setTransient' => false,
     ]);
 
-    return new SubscribersFeature($settings, $subscribersRepository, $wpFunctions);
+    $bridge = Stub::make(Bridge::class, [
+      'getPremiumKeyState' => [
+        'state' => $specs['premium_key_state'],
+        'data' => [
+          'site_active_subscriber_limit' => $specs['premium_subscribers_limit'],
+          'support_tier' => $specs['support_tier'] ?? 'free',
+        ],
+      ],
+      'getMssKeyState' => [
+        'state' => $specs['mss_key_state'],
+        'data' => [
+          'site_active_subscriber_limit' => $specs['mss_subscribers_limit'],
+        ],
+      ],
+    ]);
+
+    return new SubscribersFeature($settings, $subscribersRepository, $wpFunctions, $bridge);
   }
 }
