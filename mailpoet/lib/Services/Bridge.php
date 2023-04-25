@@ -275,6 +275,15 @@ class Bridge {
       $key
     );
 
+    // If the new state is not valid we want to preserve the data from the previous state.
+    // The data contains info about state limits and we need those to display the correct info to users.
+    if (empty($state['data'])) {
+      $previousState = $this->getKeyState($keyType);
+      if (!empty($previousState['data'])) {
+        $state['data'] = $previousState['data'];
+      }
+    }
+
     // store the key state
     $this->settings->set(
       $this->getKeyStateSettingsKey((string)$key, $keyStateSettingName),

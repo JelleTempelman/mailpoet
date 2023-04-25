@@ -385,8 +385,73 @@ class BridgeTest extends \MailPoetTest {
     expect($result['ok'])->equals(true); // verified
   }
 
+  public function testItPreservesMSSKeyStateDataIfSubsequentCheckFails() {
+    $apiMock = $this->createMock(API::class);
+    $data = ['some_key' => 'some_value'];
+    $okResponse = [
+      'code' => 200,
+      'data' => $data,
+    ];
+    $errorResponse = [
+      'code' => 403,
+      'error_message' => 'Insufficient privileges',
+    ];
+    $apiMock
+      ->expects($this->exactly(2))
+      ->method('checkMSSKey')->willReturnOnConsecutiveCalls($okResponse, $errorResponse);
+    $apiMock
+      ->expects($this->exactly(2))
+      ->method('setKey')->willReturn(null);
+    $this->bridge->api = $apiMock;
+
+    // First check succeeds
+    $result = $this->bridge->checkMSSKey('abc');
+    $this->bridge->storeMSSKeyAndState('abc', $result);
+    $state = $this->bridge->getMssKeyState() ?? [];
+    expect($state['state'])->equals(Bridge::KEY_VALID);
+    expect($state['data'])->equals($data);
+    // Second check fails with 403 insufficient privileges simulating that key lost access to MSS
+    $result = $this->bridge->checkMSSKey('abc');
+    $this->bridge->storeMSSKeyAndState('abc', $result);
+    $state = $this->bridge->getMssKeyState() ?? [];
+    expect($state['state'])->equals(Bridge::KEY_VALID_UNDERPRIVILEGED);
+    expect($state['data'])->equals($data);
+  }
+
+  public function testItPreservesPremiumKeyStateDataIfSubsequentCheckFails() {
+    $apiMock = $this->createMock(API::class);
+    $data = ['some_key' => 'some_value'];
+    $okResponse = [
+      'code' => 200,
+      'data' => $data,
+    ];
+    $errorResponse = [
+      'code' => 403,
+      'error_message' => 'Insufficient privileges',
+    ];
+    $apiMock
+      ->expects($this->exactly(2))
+      ->method('checkPremiumKey')->willReturnOnConsecutiveCalls($okResponse, $errorResponse);
+    $apiMock
+      ->expects($this->exactly(2))
+      ->method('setKey')->willReturn(null);
+    $this->bridge->api = $apiMock;
+
+    // First check succeeds
+    $result = $this->bridge->checkPremiumKey('abc');
+    $this->bridge->storePremiumKeyAndState('abc', $result);
+    $state = $this->bridge->getPremiumKeyState() ?? [];
+    expect($state['state'])->equals(Bridge::KEY_VALID);
+    expect($state['data'])->equals($data);
+    // Second check fails with 403 insufficient privileges simulating that key lost access to MSS
+    $result = $this->bridge->checkPremiumKey('abc');
+    $this->bridge->storePremiumKeyAndState('abc', $result);
+    $state = $this->bridge->getPremiumKeyState() ?? [];
+    expect($state['state'])->equals(Bridge::KEY_VALID_UNDERPRIVILEGED);
+    expect($state['data'])->equals($data);
+  }
+
   public function testItSavesAccessRestrictionForUnderprivilegePremiumKeys() {
-    $api = $this->createMock(API::class);
     // Insufficient privileges
     $this->checkKeyAccessRestrictionSetProperly(
       'premium',
@@ -475,10 +540,6 @@ class BridgeTest extends \MailPoetTest {
     return $this->settings->get(Bridge::API_KEY_SETTING_NAME);
   }
 
-  private function getMSSKeyState() {
-    return $this->settings->get(Bridge::API_KEY_STATE_SETTING_NAME);
-  }
-
   private function fillPremiumKey() {
     $this->settings->set(
       Bridge::PREMIUM_KEY_SETTING_NAME,
@@ -488,9 +549,5 @@ class BridgeTest extends \MailPoetTest {
 
   private function getPremiumKey() {
     return $this->settings->get(Bridge::PREMIUM_KEY_SETTING_NAME);
-  }
-
-  private function getPremiumKeyState() {
-    return $this->settings->get(Bridge::PREMIUM_KEY_STATE_SETTING_NAME);
   }
 }
