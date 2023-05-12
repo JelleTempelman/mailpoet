@@ -106,6 +106,7 @@ class Hooks {
     $this->setupSettingsLinkInPluginPage();
     $this->setupChangeNotifications();
     $this->setupLicenseProvisioning();
+    $this->temporaryFixForBridge();
   }
 
   public function initEarlyHooks() {
@@ -490,5 +491,22 @@ class Hooks {
       10,
       3
     );
+  }
+
+  /**
+   * Temporary fix for bridge.mailpoet.com
+   */
+  public function temporaryFixForBridge() {
+    $this->wp->addFilter('http_request_args', function($parsed_args, $url) {
+      // check if the url is the one we want to modify
+      if (strpos($url, 'bridge.mailpoet.com') === false) {
+        return $parsed_args;
+      }
+      if (!empty($parsed_args['headers']) && isset($parsed_args['headers']['referer'])) {
+        // remove the referer header
+        unset($parsed_args['headers']['referer']);
+      }
+      return $parsed_args;
+    }, 10, 2);
   }
 }
