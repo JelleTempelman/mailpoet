@@ -925,13 +925,6 @@ workflows:
             - performance_tests
 
   nightly:
-    triggers:
-      - schedule:
-          cron: '0 22 * * 1-5'
-          filters:
-            branches:
-              only:
-                - trunk
     jobs:
       - build:
           <<: *slack-fail-post-step
