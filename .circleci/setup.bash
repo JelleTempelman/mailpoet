@@ -51,6 +51,7 @@ function setup {
         wp site create --slug=dummy_multisite $wp_cli_wordpress_path $wp_cli_allow_root
     else
     	wp core install --admin_name=admin --admin_password=admin --admin_email=admin@mailpoet.loc --url=http://mailpoet.loc --title="WordPress Single" $wp_cli_wordpress_path $wp_cli_allow_root
+      wp core update --allow-root --version=6.4 --path="$root_dir/wordpress"
     	echo "WP_ROOT=/home/circleci/mailpoet/wordpress" >> "$root_dir/mailpoet/.env"
     fi
 
