@@ -98,6 +98,21 @@ class WooCommerceBlocksIntegration {
       ],
       $this->wp
     ));
+
+    $this->unregisterAutomateWooCheckoutBlock($integration_registry);
+  }
+
+  public function unregisterAutomateWooCheckoutBlock($integration_registry) {
+    if (!$this->settings->get('woocommerce.optin_on_checkout.enabled', false)) {
+      return;
+    }
+
+    $blockName = 'automatewoo';
+
+    $isAutomateWooRegistered = $integration_registry->is_registered($blockName);
+    if ($isAutomateWooRegistered) {
+      $integration_registry->unregister($blockName);
+    }
   }
 
   public function addDataAttributesToBlock(array $blocks) {
