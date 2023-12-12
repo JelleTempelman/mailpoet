@@ -80,7 +80,7 @@ export function AutomationListing(): JSX.Element {
   const status = pageSearch.get('status');
 
   useEffect(() => {
-    loadAutomations();
+    void loadAutomations();
   }, [loadAutomations]);
 
   // focus tab button on status change (needed due to the force re-mount below)

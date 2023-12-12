@@ -16,7 +16,7 @@ export const useRestoreButton = (automation: Automation): Item | undefined => {
     control: {
       title: __('Restore', 'mailpoet'),
       icon: null,
-      onClick: () => restoreAutomation(automation, AutomationStatus.DRAFT),
+      onClick: () => void restoreAutomation(automation, AutomationStatus.DRAFT),
     },
   };
 };
