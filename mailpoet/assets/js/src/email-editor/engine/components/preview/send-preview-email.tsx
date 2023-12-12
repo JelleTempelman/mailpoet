@@ -32,7 +32,7 @@ export function SendPreviewEmail() {
   ) as [MailPoetEmailData, unknown, unknown];
 
   const handleSendPreviewEmail = () => {
-    requestSendingNewsletterPreview(mailpoetEmailData.id, previewToEmail);
+    void requestSendingNewsletterPreview(mailpoetEmailData.id, previewToEmail);
   };
 
   const closeCallback = () => togglePreviewModal(false);
@@ -123,7 +123,7 @@ export function SendPreviewEmail() {
       <TextControl
         label={__('Send to', 'mailpoet')}
         onChange={(email) => {
-          updateSendPreviewEmail(email);
+          void updateSendPreviewEmail(email);
         }}
         value={previewToEmail}
         type="email"
