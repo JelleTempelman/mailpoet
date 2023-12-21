@@ -154,7 +154,7 @@ jobs:
             ./tools/vendor/composer.phar validate --no-check-all --no-check-publish --working-dir=prefixer
             touch .env
             ./do install
-            ./do compile:all --env production
+            ./do compile:all --env production --tests=skip
             ./do doctrine:generate-cache
             vendor/bin/codecept build
             ./do twig:generate-cache
@@ -326,6 +326,9 @@ jobs:
       - run:
           name: 'Preparing test results folder'
           command: mkdir test-results
+      - run:
+          name: 'Build tests for newsletter editor'
+          command: ./do compile:all --env production --tests=only
       - run:
           name: 'JS Newsletter Editor Tests'
           command: |
