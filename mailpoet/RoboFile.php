@@ -202,7 +202,13 @@ class RoboFile extends \Robo\Tasks {
     $env = ($opts['env']) ?
       sprintf('./node_modules/.bin/cross-env NODE_ENV="%s"', $opts['env']) :
       null;
-    return $this->_exec($env . ' ./node_modules/webpack/bin/webpack.js --env BUILD_TESTS=' . ($opts['tests'] === 'build' ? 'build' : 'skip'));
+    $tests = 'build';
+    if ($opts['tests'] === 'skip') {
+      $tests = 'skip';
+    } else if ($opts['tests'] === 'only') {
+      $tests = 'only';
+    }
+    return $this->_exec($env . ' ./node_modules/webpack/bin/webpack.js --env BUILD_TESTS=' . $tests);
   }
 
   public function compileCss($opts = ['env' => null]) {

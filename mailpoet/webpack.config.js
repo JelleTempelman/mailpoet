@@ -457,7 +457,7 @@ const emailEditorCustom = Object.assign({}, wpScriptConfig, {
     : [...wpScriptConfig.plugins, ...[new ForkTsCheckerWebpackPlugin()]],
 });
 
-const configs = [
+let configs = [
   publicConfig,
   adminConfig,
   emailEditorCustom,
@@ -470,6 +470,9 @@ module.exports = (env) => {
   // Include tests build only if requested
   if (env && env.BUILD_TESTS === 'build') {
     configs.push(testConfig);
+  } // Build only tests
+  if (env && env.BUILD_TESTS === 'only') {
+    configs = [testConfig];
   }
   return configs.map((conf) => {
     const config = Object.assign({}, conf);
