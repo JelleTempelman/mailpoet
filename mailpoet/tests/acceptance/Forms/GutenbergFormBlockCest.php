@@ -2,7 +2,6 @@
 
 namespace MailPoet\Test\Acceptance;
 
-use Facebook\WebDriver\WebDriverKeys;
 use MailPoet\Subscription\Captcha\CaptchaConstants;
 use MailPoet\Test\DataFactories\Form;
 use MailPoet\Test\DataFactories\Settings;
@@ -118,9 +117,10 @@ class GutenbergFormBlockCest {
     $i->login();
     $i->amEditingPostWithId($postId);
     $i->waitForText('My Gutenberg form');
-    $i->pressKey('body', WebDriverKeys::ESCAPE);
+    // Close modal if any
+    $this->closeDialog($i);
     $i->click('.block-editor-inserter');
-    $i->fillField('.components-search-control__input', 'MailPoet Subscription Form');
+    $i->fillField('.components-input-control__input', 'MailPoet Subscription Form');
     $i->click('.editor-block-list-item-mailpoet-subscription-form-block');
     $i->selectOption('.mailpoet-block-create-forms-list', 'Acceptance Test Block Form');
     $i->waitForElementVisible('[data-automation-id="form_email"]');
@@ -158,5 +158,14 @@ class GutenbergFormBlockCest {
       'post_content' => '',
       'post_status' => 'publish',
     ]);
+  }
+
+  private function closeDialog(\AcceptanceTester $i): void {
+    $closeButton = $i->executeJS('return document.querySelectorAll("button[aria-label=\'Close\']");');
+
+    if ($closeButton) {
+      $i->click('button[aria-label="Close"]');
+      $i->waitForElementNotVisible('button[aria-label="Close"]');
+    }
   }
 }
