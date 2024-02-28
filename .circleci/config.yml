@@ -82,7 +82,6 @@ anchors:
     requires:
       - unit_tests
       - static_analysis_php8
-    <<: *only_trunk_and_release
 
   command_add_github_key: &command_add_github_key
     command: |
@@ -892,7 +891,6 @@ workflows:
           name: acceptance_tests_multisite
       - integration_tests:
           <<: *slack-fail-post-step
-          <<: *only_trunk_and_release
           multisite: 1
           name: integration_tests_multisite
           requires:
