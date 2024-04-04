@@ -71,36 +71,26 @@ class RendererTest extends \MailPoetTest {
     verify($rendered['text'])->stringContainsString('Hello!');
   }
 
-  public function testItInlinesStyles(): void {
-    $stylesCallback = function ($styles) {
-      return $styles . 'body { color: pink; }';
-    };
-    add_filter('mailpoet_email_renderer_styles', $stylesCallback);
+  public function testItContainsBodyStyles(): void {
     $rendered = $this->renderer->render($this->emailPost, 'Subject', '', 'en');
     $style = $this->getStylesValueForTag($rendered['html'], ['tag_name' => 'body']);
-    verify($style)->stringContainsString('color:pink');
-    remove_filter('mailpoet_email_renderer_styles', $stylesCallback);
+    verify($style)->stringContainsString('margin: 0;');
+    verify($style)->stringContainsString('padding: 0;');
   }
 
-  public function testItInlinesBodyStyles(): void {
-    $rendered = $this->renderer->render($this->emailPost, 'Subject', '', 'en');
-    $style = $this->getStylesValueForTag($rendered['html'], ['tag_name' => 'body']);
-    verify($style)->stringContainsString('margin:0;padding:0;');
-  }
-
-  public function testItInlinesWrappersStyles(): void {
+  public function testItContainsWrappersStyles(): void {
     $rendered = $this->renderer->render($this->emailPost, 'Subject', '', 'en');
 
     // Verify body element styles
     $style = $this->getStylesValueForTag($rendered['html'], ['tag_name' => 'body']);
-    verify($style)->stringContainsString('background:#123456');
+    verify($style)->stringContainsString('background: #123456');
 
     // Verify content wrapper element styles
     $style = $this->getStylesValueForTag($rendered['html'], ['tag_name' => 'td', 'class_name' => 'email_content_wrapper']);
-    verify($style)->stringContainsString('font-family:Test Font Family;');
-    verify($style)->stringContainsString('background:#654321');
-    verify($style)->stringContainsString('padding-top:3px;');
-    verify($style)->stringContainsString('padding-bottom:4px;');
+    verify($style)->stringContainsString('font-family: Test Font Family;');
+    verify($style)->stringContainsString('background: #654321');
+    verify($style)->stringContainsString('padding-top: 3px;');
+    verify($style)->stringContainsString('padding-bottom: 4px;');
 
     // Verify layout element styles
     $doc = new \DOMDocument();

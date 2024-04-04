@@ -8,11 +8,9 @@ use MailPoet\EmailEditor\Engine\Renderer\ContentRenderer\Postprocessors\Variable
 use MailPoet\EmailEditor\Engine\SettingsController;
 use MailPoet\EmailEditor\Engine\ThemeController;
 use MailPoet\Util\CdnAssetUrl;
-use MailPoet\Util\pQuery\DomNode;
 use MailPoetVendor\Html2Text\Html2Text;
 
 class Renderer {
-  private \MailPoetVendor\CSS $cssInliner;
   private SettingsController $settingsController;
   private ThemeController $themeController;
   private ContentRenderer $contentRenderer;
@@ -22,18 +20,13 @@ class Renderer {
   const TEMPLATE_FILE = 'template.html';
   const TEMPLATE_STYLES_FILE = 'template.css';
 
-  /**
-   * @param \MailPoetVendor\CSS $cssInliner
-   */
   public function __construct(
-    \MailPoetVendor\CSS $cssInliner,
     SettingsController $settingsController,
     ContentRenderer $contentRenderer,
     CdnAssetUrl $cdnAssetUrl,
     ServicesChecker $servicesChecker,
     ThemeController $themeController
   ) {
-    $this->cssInliner = $cssInliner;
     $this->settingsController = $settingsController;
     $this->contentRenderer = $contentRenderer;
     $this->cdnAssetUrl = $cdnAssetUrl;
@@ -91,8 +84,6 @@ class Renderer {
       ]
     );
 
-    $templateWithContentsDom = $this->inlineCSSStyles($templateWithContents);
-    $templateWithContents = $this->postProcessTemplate($templateWithContentsDom);
     // Because the padding can be defined by variables, we need to postprocess the HTML by VariablesPostprocessor
     $variablesPostprocessor = new VariablesPostprocessor($this->themeController);
     $templateWithContents = $variablesPostprocessor->postprocess($templateWithContents);
@@ -111,29 +102,10 @@ class Renderer {
 
   /**
    * @param string $template
-   * @return DomNode
-   */
-  private function inlineCSSStyles($template) {
-    return $this->cssInliner->inlineCSS($template);
-  }
-
-  /**
-   * @param string $template
    * @return string
    */
   private function renderTextVersion($template) {
     $template = (mb_detect_encoding($template, 'UTF-8', true)) ? $template : mb_convert_encoding($template, 'UTF-8', mb_list_encodings());
     return @Html2Text::convert($template);
-  }
-
-  /**
-   * @param DomNode $templateDom
-   * @return string
-   */
-  private function postProcessTemplate(DomNode $templateDom) {
-    // because tburry/pquery contains a bug and replaces the opening non mso condition incorrectly we have to replace the opening tag with correct value
-    $template = $templateDom->__toString();
-    $template = str_replace('<!--[if !mso]><![endif]-->', '<!--[if !mso]><!-- -->', $template);
-    return $template;
   }
 }
