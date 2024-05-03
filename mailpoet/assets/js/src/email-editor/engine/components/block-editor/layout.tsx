@@ -32,6 +32,7 @@ import { InserterSidebar } from '../inserter-sidebar/inserter-sidebar';
 import { EditorNotices, EditorSnackbars, SentEmailNotice } from '../notices';
 import { StylesSidebar } from '../styles-sidebar';
 import { unlock } from '../../../lock-unlock';
+import { TemplateSelection } from '../template-select';
 
 const { EditorCanvas } = unlock(editorPrivateApis);
 
@@ -129,6 +130,7 @@ export function Layout() {
       <SentEmailNotice />
       <Sidebar />
       <StylesSidebar />
+      <TemplateSelection />
       <InterfaceSkeleton
         className={className}
         header={<Header />}
