@@ -66,6 +66,7 @@ BehaviorsLookup.TextEditorBehavior = Marionette.Behavior.extend({
         relative_urls: false,
         remove_script_host: false,
         convert_urls: true,
+        convert_unsafe_embeds: true, // this can be removed after upgrading to TinyMCE 7
         urlconverter_callback: function urlconverterCallback(url) {
           if (url.match(/\[.+\]/g)) {
             // Do not convert URLs with shortcodes
