@@ -9,14 +9,14 @@ modules:
         password: wordpress
         populate: false
         cleanup: false
-        url: 'http://test.local'
+        url: 'http://mpperftesting.com'
         urlReplacement: true
         tablePrefix: 'mp_'
     - WPLoader:
         # use 'loadOnly' (as recommended by https://wpbrowser.wptestkit.dev/summary/modules/wploader)
         # set 'domain' which is needed by multisite (tests fail silently without it)
         loadOnly: true
-        domain: test.local
+        domain: mpperftesting.com
         wpRootFolder: /wp-core
         dbHost: mysql
         dbName: wordpress
@@ -24,7 +24,7 @@ modules:
         dbPassword: wordpress
     - WPWebDriver: # https://codeception.com/docs/modules/WebDriver#configuration
         host: chrome
-        url: 'http://test.local'
+        url: 'http://mpperftesting.com'
         browser: chrome
         port: 4444
         window_size: '1366x980'

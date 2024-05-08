@@ -28,3 +28,8 @@ tasks/phpstan/_phpstan-wp-source.neon
 /tools/vendor
 /storybook-static
 assets/js/src/newsletter-editor/behaviors/tinymce-icons.js
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

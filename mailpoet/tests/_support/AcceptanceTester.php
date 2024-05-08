@@ -84,6 +84,15 @@ class AcceptanceTester extends \Codeception\Actor {
     $i->saveSessionSnapshot('login');
   }
 
+  public function logging() {
+    $i = $this;
+    $i->wait(1);
+    $i->fillField('Username', 'admin');
+    $i->fillField('Password', 'u2YNOVMJVd@!');
+    $i->click('Log In');
+    $i->waitForText('MailPoet', 10);
+  }
+
   /**
    * Define custom actions here
    */
