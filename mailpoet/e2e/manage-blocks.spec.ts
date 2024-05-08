@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { logIn } from './utils/login';
 
-test.skip('can manage blocks inside the new email editor', async ({ page }) => {
+test('can manage blocks inside the new email editor', async ({ page }) => {
 	const newsletterTitle = `Newsletter-${new Date().getTime().toString()}`;
 	
-	await page.goto('https://mpperftesting.com/wp-admin/');
+	await page.goto('https://veljko.qawp.net/wp-admin/');
 
 	// Log in with admin credentials
-	await logIn(page, 'admin', 'u2YNOVMJVd@!');
+	await logIn(page, 'mailpoet', 'uTG$OV!MJVd');
 
 	// Go to create a new newsletter page
-	await page.goto('https://mpperftesting.com/wp-admin/admin.php?page=mailpoet-newsletters#/new');
+	await page.goto('https://veljko.qawp.net/wp-admin/admin.php?page=mailpoet-newsletters#/new');
 
 	// Choose to create it using a new email editor
 	await expect(page.getByText('What would you like to create?')).toBeVisible();

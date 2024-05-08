@@ -87,8 +87,8 @@ class AcceptanceTester extends \Codeception\Actor {
   public function logging() {
     $i = $this;
     $i->wait(1);
-    $i->fillField('Username', 'admin');
-    $i->fillField('Password', 'u2YNOVMJVd@!');
+    $i->fillField('Username', 'mailpoet');
+    $i->fillField('Password', 'uTG$OV!MJVd');
     $i->click('Log In');
     $i->waitForText('MailPoet', 10);
   }
